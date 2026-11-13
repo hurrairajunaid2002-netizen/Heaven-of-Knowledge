@@ -1,9 +1,24 @@
-import { Mail, MapPin, MessageCircle } from "lucide-react";
+import { Mail, MessageCircle } from "lucide-react";
 import Container from "@/components/ui/Container";
 import Reveal from "@/components/ui/Reveal";
 import SectionHeading from "@/components/ui/SectionHeading";
 import { siteConfig } from "@/config/siteConfig";
 import { getGeneralWhatsAppLink } from "@/lib/whatsapp";
+
+const contactMethods = (whatsappLink) => [
+  {
+    label: "WhatsApp",
+    value: siteConfig.whatsappDisplay,
+    href: whatsappLink,
+    icon: MessageCircle,
+  },
+  {
+    label: "Email",
+    value: siteConfig.email,
+    href: `mailto:${siteConfig.email}`,
+    icon: Mail,
+  },
+];
 
 export default function Contact() {
   const whatsappLink = getGeneralWhatsAppLink();
@@ -18,7 +33,7 @@ export default function Contact() {
         />
 
         <Reveal className="w-full max-w-2xl">
-          <div className="flex flex-col items-center gap-8 rounded-3xl border border-beige bg-gradient-to-br from-paper via-paper to-terracotta-soft/40 p-10 text-center shadow-sm shadow-navy/5 sm:p-14">
+          <div className="flex flex-col items-center gap-10 rounded-3xl border border-beige bg-gradient-to-br from-paper via-paper to-terracotta-soft/40 p-10 text-center shadow-sm shadow-navy/5 sm:p-14">
             <a
               href={whatsappLink}
               target="_blank"
@@ -29,19 +44,28 @@ export default function Contact() {
               Chat with us on WhatsApp
             </a>
 
-            <div className="flex flex-col gap-4 font-sans text-sm text-ink-soft sm:flex-row sm:gap-10">
-              <span className="flex items-center justify-center gap-2">
-                <MessageCircle className="h-4 w-4 text-gold" aria-hidden />
-                {siteConfig.whatsappDisplay}
-              </span>
-              <span className="flex items-center justify-center gap-2">
-                <Mail className="h-4 w-4 text-gold" aria-hidden />
-                {siteConfig.email}
-              </span>
-              <span className="flex items-center justify-center gap-2">
-                <MapPin className="h-4 w-4 text-gold" aria-hidden />
-                {siteConfig.address}
-              </span>
+            <div className="grid w-full gap-4 sm:grid-cols-2">
+              {contactMethods(whatsappLink).map(({ label, value, href, icon: Icon }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target={href.startsWith("http") ? "_blank" : undefined}
+                  rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
+                  className="flex items-center gap-4 rounded-2xl border border-beige/80 bg-ivory/70 p-5 text-left transition-colors hover:border-gold/40 hover:bg-ivory"
+                >
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gold-soft/60 text-gold">
+                    <Icon className="h-5 w-5" aria-hidden />
+                  </span>
+                  <span className="flex flex-col gap-0.5 overflow-hidden">
+                    <span className="font-sans text-xs font-semibold uppercase tracking-[0.15em] text-ink-soft">
+                      {label}
+                    </span>
+                    <span className="truncate font-sans text-sm font-medium text-navy">
+                      {value}
+                    </span>
+                  </span>
+                </a>
+              ))}
             </div>
 
             <p className="max-w-md text-sm leading-relaxed text-ink-soft">

@@ -9,6 +9,7 @@ import { getGeneralWhatsAppLink } from "@/lib/whatsapp";
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [pendingHash, setPendingHash] = useState(null);
 
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 12);
@@ -18,11 +19,51 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = isMenuOpen ? "hidden" : "";
+    if (!isMenuOpen) return;
+
+    // iOS Safari ignores `overflow: hidden` on body and keeps rubber-band
+    // scrolling the page underneath the open menu. Any stray scroll during a
+    // tap gets interpreted as a drag, which cancels the synthetic click on
+    // nav links. Locking scroll via fixed position prevents that.
+    const scrollY = window.scrollY;
+    const { body } = document;
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.left = "0";
+    body.style.right = "0";
+
     return () => {
-      document.body.style.overflow = "";
+      body.style.position = "";
+      body.style.top = "";
+      body.style.left = "";
+      body.style.right = "";
+      window.scrollTo(0, scrollY);
     };
   }, [isMenuOpen]);
+
+  // Runs after the scroll-lock cleanup above has released `position: fixed`
+  // on body. Scrolling while that's still applied is a no-op, which is why
+  // this has to wait rather than scroll immediately on click.
+  useEffect(() => {
+    if (isMenuOpen || !pendingHash) return;
+    const target = document.querySelector(pendingHash);
+    // A double rAF ensures the browser has actually painted the unlocked
+    // layout before the smooth scroll starts; starting it in the same tick
+    // as the unlock intermittently gets silently dropped.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        target?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
+    window.history.pushState(null, "", pendingHash);
+    setPendingHash(null);
+  }, [isMenuOpen, pendingHash]);
+
+  const handleMobileNavClick = (event, href) => {
+    event.preventDefault();
+    setIsMenuOpen(false);
+    setPendingHash(href);
+  };
 
   const whatsappLink = getGeneralWhatsAppLink();
 
@@ -93,7 +134,7 @@ export default function Navbar() {
                 <li key={item.href}>
                   <a
                     href={item.href}
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={(event) => handleMobileNavClick(event, item.href)}
                     className="block rounded-lg px-3 py-3 font-sans text-base font-medium text-ink transition-colors hover:bg-beige/40"
                   >
                     {item.label}

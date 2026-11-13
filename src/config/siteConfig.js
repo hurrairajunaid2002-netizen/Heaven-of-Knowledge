@@ -14,7 +14,6 @@ export const siteConfig = {
   whatsappDisplay: "+92 321 2303103",
 
   email: "heavenofknowledge.pk@gmail.com",
-  address: "Add your city / store address here",
 
   social: {
     instagram: "#",
