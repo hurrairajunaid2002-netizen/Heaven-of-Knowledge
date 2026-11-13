@@ -51,12 +51,12 @@ export default function Contact() {
                   href={href}
                   target={href.startsWith("http") ? "_blank" : undefined}
                   rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
-                  className="flex items-center gap-4 rounded-2xl border border-beige/80 bg-ivory/70 p-5 text-left transition-colors hover:border-gold/40 hover:bg-ivory"
+                  className="flex min-w-0 items-center gap-4 rounded-2xl border border-beige/80 bg-ivory/70 p-5 text-left transition-colors hover:border-gold/40 hover:bg-ivory"
                 >
                   <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gold-soft/60 text-gold">
                     <Icon className="h-5 w-5" aria-hidden />
                   </span>
-                  <span className="flex flex-col gap-0.5 overflow-hidden">
+                  <span className="flex min-w-0 flex-col gap-0.5">
                     <span className="font-sans text-xs font-semibold uppercase tracking-[0.15em] text-ink-soft">
                       {label}
                     </span>
